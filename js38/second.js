@@ -2,8 +2,9 @@
 function createCircle(radius) {
     return {
         radius,
+        surfaceArea: radius**2*3.14,
         surface: function surface() {
-            console.log('Surface of ' + radius + 'm radius circle = ' + (radius*3.14));
+            console.log(this.radius + 'm : ' + this.surfaceArea);
         }
     }
 }
@@ -16,9 +17,10 @@ circle2.surface();
 //Constructor
 function Circle(radius) {
     this.radius = radius;
-    this.surface = function(){
-        console.log('Surface of ' + this.radius + 'm radius circle = ' + (this.radius*3.14));
+    this.surfaceArea = radius**2*3.14;
+    this.surface2 = function(){
+        console.log('Surface of ' + this.radius + 'm radius circle = ' + this.surfaceArea);
     };
 }
 const another = new Circle(3);
-another.surface();
+another.surface2();
