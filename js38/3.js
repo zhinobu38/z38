@@ -1,3 +1,5 @@
+//key in object
+
 function Circle(radius) {
     this.radius = radius;
     this.draw = function() {
@@ -16,3 +18,4 @@ for (let key in circle) {
 if ('radius' in circle) {
     console.log('Radius is in the circle.');
 }
+
