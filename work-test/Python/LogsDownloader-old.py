@@ -58,7 +58,7 @@ from Crypto.Cipher import AES
 """
 Main class for downloading log files
 """
-#test12345sfasfadwf
+#test12345sfasfadwfasdfd
 
 class LogsDownloader:
 
