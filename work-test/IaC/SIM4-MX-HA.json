@@ -1,0 +1,1260 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Imperva SecureSphere 14.7.0.40 - WAF Management Server HA BYOL",
+  "Mappings": {
+    "ImpervaVariables": {
+      "General": {
+        "Products": " wafmxhabyol",
+        "HealthCheckPort": "50007"
+      },
+      "SSH": {
+        "UserName": "ec2-user"
+      },
+      "license": {
+        "encryptedValue": "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"
+      },
+      "flexKey": {
+        "KeyValue": "NONE"
+      }
+    },
+    "wafmxhabyolRegion2Ami": {
+      "af-south-1": {
+        "ImageId": "ami-0c527bf1485694157"
+      },
+      "ap-east-1": {
+        "ImageId": "ami-0be6375d4fb28c0b6"
+      },
+      "ap-northeast-1": {
+        "ImageId": "ami-0adf0dd89dab520cb"
+      },
+      "ap-northeast-2": {
+        "ImageId": "ami-04f91a65c2f5f3c83"
+      },
+      "ap-northeast-3": {
+        "ImageId": "ami-03ba47fe258bfb3a0"
+      },
+      "ap-south-1": {
+        "ImageId": "ami-0f39ca5975b2832a4"
+      },
+      "ap-southeast-1": {
+        "ImageId": "ami-08285bea65c85df80"
+      },
+      "ap-southeast-2": {
+        "ImageId": "ami-08e98ae63ac533e9a"
+      },
+      "ap-southeast-4": {
+        "ImageId": "ami-03bd21212341c672c"
+      },
+      "ca-central-1": {
+        "ImageId": "ami-073f063424774cd1b"
+      },
+      "eu-central-1": {
+        "ImageId": "ami-01a5f7343e03b2b96"
+      },
+      "eu-north-1": {
+        "ImageId": "ami-0f86298fa081fbdcc"
+      },
+      "eu-west-1": {
+        "ImageId": "ami-0472a53c9f38da081"
+      },
+      "eu-west-2": {
+        "ImageId": "ami-0ce5437895524018b"
+      },
+      "eu-west-3": {
+        "ImageId": "ami-0af386c67b99ac769"
+      },
+      "sa-east-1": {
+        "ImageId": "ami-0da44fdf9d1e19307"
+      },
+      "us-east-1": {
+        "ImageId": "ami-041b028a2d4ea9959"
+      },
+      "us-east-2": {
+        "ImageId": "ami-0066d124e2abc1cb9"
+      },
+      "us-gov-east-1": {
+        "ImageId": "ami-0f3584957d2554067"
+      },
+      "us-gov-west-1": {
+        "ImageId": "ami-0460d8f8e1a4f7846"
+      },
+      "us-west-1": {
+        "ImageId": "ami-0214f8579d5ed67f1"
+      },
+      "us-west-2": {
+        "ImageId": "ami-05e66da24c094ffe1"
+      }
+    }
+  },
+  "Parameters": {
+    "keyPairName": {
+      "ConstraintDescription": "Must be a valid Key Pair name",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Description": "Select name of an existing EC2 Key Pair to enable SSH access to the instances"
+    },
+    "vpc": {
+      "ConstraintDescription": "Must be a valid VPC Id (vpc-*)",
+      "Type": "AWS::EC2::VPC::Id",
+      "Description": "Select the Virtual Private Cloud (VPC) Id for the SecureSphere stack"
+    },
+    "securePassword": {
+      "AllowedPattern": "^[0-9a-zA-Z\\*\\=\\_\\|\\#\\%\\^\\:\\/\\~\\.\\,\\+\\-]*$",
+      "ConstraintDescription": "The password must be 7 to 14 characters long and must contain only the characters: 0-9,a-z,A-Z and *\\=_|#%^:/~.,+-",
+      "NoEcho": "true",
+      "Description": "Enter the Secure application password (GW->MX registration)",
+      "MaxLength": "14",
+      "MinLength": "7",
+      "Type": "String"
+    },
+    "timezone": {
+      "Default": "Asia/Bangkok",
+      "AllowedPattern": "[0-9a-zA-Z\\+\\-\\/\\.\\_]*",
+      "ConstraintDescription": "Timezone string must be 3 to 30 characters. Please Specify the time zone using the Posix TZ format",
+      "Description": "Enter Timezone string using the Posix TZ format. If you enter\t\"default\", the Amazon default (GMT) is used",
+      "MinLength": "3",
+      "MaxLength": "30",
+      "Type": "String"
+    },
+    "mxInstanceType": {
+      "Default": "m5.2xlarge",
+      "Description": "Select MX Instance Type",
+      "ConstraintDescription": "Must be of EC2 instance type: c4.xlarge, c4.2xlarge, c5.xlarge, c5.2xlarge, m4.xlarge, m4.2xlarge, m4.4xlarge, m5.xlarge, m5.2xlarge, m5.4xlarge",
+      "Type": "String",
+      "AllowedValues": [
+        "c4.xlarge",
+        "c4.2xlarge",
+        "c5.xlarge",
+        "c5.2xlarge",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m5.xlarge",
+        "m5.2xlarge",
+        "m5.4xlarge"
+      ]
+    },
+    "mxTerminationProtection": {
+      "Default": "Yes",
+      "Description": "Enable termination protection for your Management-Server instance(s) to prevent accidental deletion (recommended)",
+      "ConstraintDescription": "Must be either Yes or No",
+      "Type": "String",
+      "AllowedValues": [
+        "Yes",
+        "No"
+      ]
+    },
+    "primaryMxSubnet": {
+      "Description": "Select primary Management-Server subnet ID",
+      "Type": "AWS::EC2::Subnet::Id",
+      "ConstraintDescription": "Must select a valid SubnetId"
+    },
+    "secondaryMxSubnet": {
+      "Description": "Select secondary Management-Server subnet ID",
+      "Type": "AWS::EC2::Subnet::Id",
+      "ConstraintDescription": "Must select a valid SubnetId"
+    },
+    "impervaLicenseKey": {
+      "Default": "MC0CFQCliYVDM4F1DHC4N3sJ5bZSO19rLQIUdUB8dll/qP37UVG7Ri1Thn9FKgA=",
+      "ConstraintDescription": "Must be a 64 characters Base64 type string",
+      "Type": "String",
+      "Description": "Enter the Imperva-License-Key to unseal machine",
+      "MinLength": "64",
+      "MaxLength": "64"
+    },
+    "mxLicenseInternalPassphrase": {
+      "Default": "pHsPgeHkZPRr7okAGY5bX0RfDFZUU7Ey",
+      "Type": "String",
+      "Description": "MxLicensePassphrase (do not change. Internal use only)"
+    },
+    "mxPassword": {
+      "AllowedPattern": "^[0-9a-zA-Z\\*\\=\\_\\|\\#\\%\\^\\:\\/\\~\\.\\,\\+\\-]*$",
+      "ConstraintDescription": "The password must be 7 to 14 characters long and must contain only the characters: 0-9,a-z,A-Z and *\\=_|#%^:/~.,+-",
+      "NoEcho": "true",
+      "Description": "Enter the server gui password",
+      "MaxLength": "14",
+      "MinLength": "7",
+      "Type": "String"
+    }
+  },
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Parameters": [
+            "securePassword",
+            "primaryMxSubnet",
+            "keyPairName",
+            "secondaryMxSubnet",
+            "vpc",
+            "mxPassword"
+          ],
+          "Label": {
+            "default": "Fill following blank parameters:"
+          }
+        },
+        {
+          "Parameters": [
+            "timezone"
+          ],
+          "Label": {
+            "default": "SecureSphere Settings (already been filled)"
+          }
+        },
+        {
+          "Parameters": [
+            "impervaLicenseKey",
+            "mxInstanceType"
+          ],
+          "Label": {
+            "default": "EC2 Settings (already been filled)"
+          }
+        },
+        {
+          "Parameters": [
+            "mxLicenseInternalPassphrase"
+          ],
+          "Label": {
+            "default": "Internal use. Please do not modify"
+          }
+        }
+      ],
+      "ParameterLabels": {
+        "keyPairName": {
+          "default": "KeyPair Name"
+        },
+        "vpc": {
+          "default": "VPC ID"
+        },
+        "securePassword": {
+          "default": "Secure Password"
+        },
+        "timezone": {
+          "default": "TimeZone"
+        },
+        "mxInstanceType": {
+          "default": "Management Server Instance Type"
+        },
+        "mxTerminationProtection": {
+          "default": "Enable MX Termination Protection"
+        },
+        "primaryMxSubnet": {
+          "default": "Primary Management Server Subnet"
+        },
+        "secondaryMxSubnet": {
+          "default": "Secondary Management Server Subnet"
+        },
+        "impervaLicenseKey": {
+          "default": "Imperva License Key"
+        },
+        "mxLicenseInternalPassphrase": {
+          "default": "Mx-License Internal Passphrase"
+        },
+        "mxPassword": {
+          "default": "Server Password"
+        }
+      }
+    }
+  },
+  "Resources": {
+    "CheckComplianceExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  {
+                    "Fn::Join": [
+                      ".",
+                      [
+                        "lambda",
+                        "amazonaws.com"
+                      ]
+                    ]
+                  }
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "lambdaCheckStackCompliance",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "VisualEditor0",
+                  "Effect": "Allow",
+                  "Action": [
+                    "cloudformation:DescribeStacks",
+                    "cloudformation:DescribeStackResources"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        ":",
+                        [
+                          "arn",
+                          {
+                            "Ref": "AWS::Partition"
+                          },
+                          "cloudformation",
+                          "*",
+                          "*",
+                          "stack/*/*"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CheckCompliance": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Runtime": {
+          "Fn::If": [
+            "IsAWSChina",
+            "python3.9",
+            "python3.11"
+          ]
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "CheckComplianceExecutionRole",
+            "Arn"
+          ]
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "import urllib3",
+                "import json",
+                "import boto3",
+                "",
+                "# Globals",
+                "http = urllib3.PoolManager()",
+                "",
+                "def send(event, context, responseStatus, responseData, reasonMessage):",
+                "    responseUrl = event['ResponseURL']",
+                "    responseBody = {",
+                "        'Status': responseStatus,",
+                "        'Reason': reasonMessage,",
+                "        'PhysicalResourceId': context.log_stream_name,",
+                "        'StackId': event['StackId'],",
+                "        'RequestId': event['RequestId'],",
+                "        'LogicalResourceId': event['LogicalResourceId'],",
+                "        'NoEcho': False,",
+                "        'Data': responseData",
+                "    }",
+                "",
+                "    encoded_data = json.dumps(responseBody).encode('utf-8')",
+                "    try:    ",
+                "        http.request(",
+                "            'PUT',",
+                "            responseUrl,",
+                "            body=encoded_data,",
+                "            headers={",
+                "                'Content-Type' : 'application/json; charset=UTF-8',",
+                "                'Content-Length' : str(len(encoded_data))",
+                "            }",
+                "        )",
+                "    except Exception as e:",
+                "        print ('send(..) failure: ' + str(e))",
+                "",
+                "def handler(event, context):",
+                "    client = boto3.client('cloudformation', region_name=event['ResourceProperties']['RegionName'])",
+                "    stat = client.describe_stacks(StackName=event['ResourceProperties']['StackName'])['Stacks'][0]['StackStatus']",
+                "",
+                "    if stat != 'UPDATE_IN_PROGRESS':",
+                "        send(event, context, 'SUCCESS', {}, '')",
+                "        return",
+                "    send(event, context, 'FAILED', {}, 'Your stack cannot be updated since the new definition includes resources other than a scale-group of gateways. Please refer to the manual for details')",
+                "    return",
+                "    response = client.describe_stack_resources(StackName=event['ResourceProperties']['StackName'])['StackResources']",
+                "    resources = set()",
+                "    for resource in response:",
+                "        resources.add(resource['LogicalResourceId'])",
+                "    if 'GatewayScalingGroup' not in resources or 'ManagementServer' in resources or 'ManagementServer1' in resources:",
+                "        send(event, context, 'FAILED', {}, 'Your stack cannot be updated since the current stack includes resources other than a scale-group of gateways. Please refer to the manual for details')",
+                "        return",
+                "    send(event, context, 'SUCCESS', {}, '')"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "ExecuteCheckCompliance": {
+      "Type": "Custom::LambdaInvoke",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CheckCompliance",
+            "Arn"
+          ]
+        },
+        "RegionName": {
+          "Ref": "AWS::Region"
+        },
+        "StackName": {
+          "Ref": "AWS::StackName"
+        },
+        "DummyToMakeItAlwaysRun": "OKST806T8L5VKSKP"
+      },
+      "DependsOn": "CheckCompliance"
+    },
+    "ManagementServer1": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": "ExecuteCheckCompliance",
+      "Properties": {
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "WaitHandle : ",
+                {
+                  "Ref": "MxWaitHandle"
+                },
+                "\n",
+                "StackId : ",
+                {
+                  "Ref": "AWS::StackId"
+                },
+                "\n",
+                "Region : ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "ProductLicensing : BYOL\n",
+                "AssetTag : AVM150\n",
+                "ProductRole : server\n",
+                "ImpervaLicenseKey : ",
+                {
+                  "Ref": "impervaLicenseKey"
+                },
+                "\n",
+                "IsEnvHA : True\n",
+                "IsPrimaryHA : True\n"
+              ]
+            ]
+          }
+        },
+        "KeyName": {
+          "Ref": "keyPairName"
+        },
+        "DisableApiTermination": {
+          "Fn::If": [
+            "MXTerminationProtectionEnabled",
+            "True",
+            "False"
+          ]
+        },
+        "IamInstanceProfile": {
+          "Ref": "MxRootInstanceProfile"
+        },
+        "InstanceType": {
+          "Ref": "mxInstanceType"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "wafmxhabyolRegion2Ami",
+            {
+              "Ref": "AWS::Region"
+            },
+            "ImageId"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  ""
+                ]
+              ]
+            }
+          }
+        ],
+        "SecurityGroupIds": [
+          {
+            "Ref": "MxInstanceSecurityGroup"
+          }
+        ],
+        "SubnetId": {
+          "Ref": "primaryMxSubnet"
+        }
+      },
+      "Metadata": {
+        "commands": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "/opt/SecureSphere/etc/ec2/ec2_auto_ftl --init_mode ",
+                " --user=",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "SSH",
+                    "UserName"
+                  ]
+                },
+                " --secure_password=",
+                {
+                  "Ref": "securePassword"
+                },
+                " --system_password=",
+                {
+                  "Ref": "securePassword"
+                },
+                " --timezone=",
+                {
+                  "Ref": "timezone"
+                },
+                " --time_servers=",
+                "default",
+                " --dns_servers=",
+                "default",
+                " --dns_domain=",
+                "default",
+                " --management_interface=eth0",
+                " --check_server_status",
+                " --initiate_services",
+                " --set_mxha",
+                " --bucket_name=",
+                {
+                  "Ref": "myS3Bucket"
+                },
+                " --healthcheck_port=",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "General",
+                    "HealthCheckPort"
+                  ]
+                },
+                " --ha_rank=primary",
+                " --encLic=",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "license",
+                    "encryptedValue"
+                  ]
+                },
+                " --passPhrase=",
+                {
+                  "Ref": "mxLicenseInternalPassphrase"
+                },
+                " --serverPassword=",
+                {
+                  "Ref": "mxPassword"
+                }
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    "ManagementServer2": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": "ExecuteCheckCompliance",
+      "Properties": {
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "WaitHandle : ",
+                {
+                  "Ref": "MxWaitHandle"
+                },
+                "\n",
+                "StackId : ",
+                {
+                  "Ref": "AWS::StackId"
+                },
+                "\n",
+                "Region : ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "ProductLicensing : BYOL\n",
+                "AssetTag : AVM150\n",
+                "ProductRole : server\n",
+                "ImpervaLicenseKey : ",
+                {
+                  "Ref": "impervaLicenseKey"
+                },
+                "\n",
+                "IsEnvHA : True\n",
+                "IsPrimaryHA : False\n"
+              ]
+            ]
+          }
+        },
+        "KeyName": {
+          "Ref": "keyPairName"
+        },
+        "DisableApiTermination": {
+          "Fn::If": [
+            "MXTerminationProtectionEnabled",
+            "True",
+            "False"
+          ]
+        },
+        "IamInstanceProfile": {
+          "Ref": "MxRootInstanceProfile"
+        },
+        "InstanceType": {
+          "Ref": "mxInstanceType"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "wafmxhabyolRegion2Ami",
+            {
+              "Ref": "AWS::Region"
+            },
+            "ImageId"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  ""
+                ]
+              ]
+            }
+          }
+        ],
+        "SecurityGroupIds": [
+          {
+            "Ref": "MxInstanceSecurityGroup"
+          }
+        ],
+        "SubnetId": {
+          "Ref": "secondaryMxSubnet"
+        }
+      },
+      "Metadata": {
+        "commands": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "/opt/SecureSphere/etc/ec2/ec2_auto_ftl --init_mode ",
+                " --user=",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "SSH",
+                    "UserName"
+                  ]
+                },
+                " --secure_password=",
+                {
+                  "Ref": "securePassword"
+                },
+                " --system_password=",
+                {
+                  "Ref": "securePassword"
+                },
+                " --timezone=",
+                {
+                  "Ref": "timezone"
+                },
+                " --time_servers=",
+                "default",
+                " --dns_servers=",
+                "default",
+                " --dns_domain=",
+                "default",
+                " --management_interface=eth0",
+                " --check_server_status",
+                " --initiate_services",
+                " --set_mxha",
+                " --bucket_name=",
+                {
+                  "Ref": "myS3Bucket"
+                },
+                " --healthcheck_port=",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "General",
+                    "HealthCheckPort"
+                  ]
+                },
+                " --ha_rank=secondary"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    "myS3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "DependsOn": "ExecuteCheckCompliance"
+    },
+    "ELBHA": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "Subnets": [
+          {
+            "Ref": "primaryMxSubnet"
+          },
+          {
+            "Ref": "secondaryMxSubnet"
+          }
+        ],
+        "CrossZone": "true",
+        "SecurityGroups": [
+          {
+            "Ref": "MxInstanceSecurityGroup"
+          }
+        ],
+        "Instances": [
+          {
+            "Ref": "ManagementServer1"
+          },
+          {
+            "Ref": "ManagementServer2"
+          }
+        ],
+        "Listeners": [
+          {
+            "LoadBalancerPort": "1234",
+            "InstancePort": "1234",
+            "InstanceProtocol": "TCP",
+            "Protocol": "TCP"
+          }
+        ],
+        "Scheme": "internal",
+        "HealthCheck": {
+          "Target": {
+            "Fn::Join": [
+              ":",
+              [
+                "TCP",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "General",
+                    "HealthCheckPort"
+                  ]
+                }
+              ]
+            ]
+          },
+          "HealthyThreshold": "2",
+          "UnhealthyThreshold": "2",
+          "Interval": "10",
+          "Timeout": "5"
+        }
+      },
+      "DependsOn": [
+        "ManagementServer1",
+        "ManagementServer2",
+        "ExecuteCheckCompliance"
+      ]
+    },
+    "MxRootRole": {
+      "Type": "AWS::IAM::Role",
+      "DependsOn": "ExecuteCheckCompliance",
+      "Properties": {
+        "Path": "/",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  {
+                    "Fn::Join": [
+                      ".",
+                      [
+                        "ec2",
+                        {
+                          "Ref": "AWS::URLSuffix"
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MxRolePolicies": {
+      "Type": "AWS::IAM::Policy",
+      "DependsOn": "ExecuteCheckCompliance",
+      "Properties": {
+        "PolicyName": "root",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "cloudformation:DescribeStackResource",
+                "cloudformation:DescribeStackResources",
+                "cloudformation:DescribeStacks",
+                "cloudformation:GetTemplate"
+              ],
+              "Resource": {
+                "Ref": "AWS::StackId"
+              },
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "ec2:CreateTags",
+                "ec2:StartInstances",
+                "ec2:StopInstances"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  ":",
+                  [
+                    "arn",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    "ec2",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "instance/*"
+                  ]
+                ]
+              },
+              "Condition": {
+                "StringEquals": {
+                  "aws:ResourceTag/aws:cloudformation:stack-id": {
+                    "Ref": "AWS::StackId"
+                  }
+                }
+              },
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "ec2:AuthorizeSecurityGroupIngress"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    ":",
+                    [
+                      "arn",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      "ec2",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "security-group/",
+                            {
+                              "Fn::GetAtt": [
+                                "MxInstanceSecurityGroup",
+                                "GroupId"
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    ":",
+                    [
+                      "arn",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      "ec2",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "security-group-rule/*"
+                    ]
+                  ]
+                }
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "ec2:CreateKeyPair"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  ":",
+                  [
+                    "arn",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    "ec2",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "key-pair/MXHA-*"
+                  ]
+                ]
+              },
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "elasticloadbalancing:CreateLoadBalancerListeners",
+                "elasticloadbalancing:DeleteLoadBalancerListeners",
+                "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  ":",
+                  [
+                    "arn",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    "elasticloadbalancing",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "loadbalancer/*"
+                  ]
+                ]
+              },
+              "Condition": {
+                "StringEquals": {
+                  "aws:ResourceTag/aws:cloudformation:stack-id": {
+                    "Ref": "AWS::StackId"
+                  }
+                }
+              },
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "ec2:DescribeInstances",
+                "s3:ListBucket",
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:ListBucketMultipartUploads",
+                "s3:ListMultipartUploadParts",
+                "s3:ListAllMyBuckets",
+                "s3:AbortMultipartUpload",
+                "ec2:DescribeTags",
+                "ec2:DescribeKeyPairs",
+                "ec2:DescribeInstanceStatus",
+                "elasticloadbalancing:DescribeInstanceHealth",
+                "elasticloadbalancing:DescribeLoadBalancers"
+              ],
+              "Resource": "*",
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "iam:UploadServerCertificate"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  ":",
+                  [
+                    "arn",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    "iam:",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "server-certificate/*"
+                  ]
+                ]
+              },
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "s3:*"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  ":",
+                  [
+                    "arn",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    "s3::",
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          {
+                            "Ref": "myS3Bucket"
+                          },
+                          "/*"
+                        ]
+                      ]
+                    }
+                  ]
+                ]
+              },
+              "Effect": "Allow"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "MxRootRole"
+          }
+        ]
+      }
+    },
+    "MxRootInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "DependsOn": [
+        "ExecuteCheckCompliance",
+        "MxRolePolicies"
+      ],
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "MxRootRole"
+          }
+        ]
+      }
+    },
+    "MxInstanceSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "DependsOn": "ExecuteCheckCompliance",
+      "Properties": {
+        "SecurityGroupIngress": [
+          {
+            "ToPort": "22",
+            "IpProtocol": "tcp",
+            "CidrIp": "10.0.0.0/8",
+            "FromPort": "22"
+          },
+          {
+            "ToPort": "22",
+            "IpProtocol": "tcp",
+            "CidrIp": "172.16.0.0/12",
+            "FromPort": "22"
+          },
+          {
+            "ToPort": "22",
+            "IpProtocol": "tcp",
+            "CidrIp": "192.168.0.0/16",
+            "FromPort": "22"
+          },
+          {
+            "ToPort": "443",
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "443"
+          },
+          {
+            "ToPort": "2812",
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "2812"
+          },
+          {
+            "ToPort": "8081",
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "8081"
+          },
+          {
+            "ToPort": "8083",
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "8083"
+          },
+          {
+            "ToPort": "8084",
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "8084"
+          },
+          {
+            "ToPort": "8085",
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "8085"
+          },
+          {
+            "ToPort": "514",
+            "IpProtocol": "udp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "514"
+          },
+          {
+            "ToPort": {
+              "Fn::FindInMap": [
+                "ImpervaVariables",
+                "General",
+                "HealthCheckPort"
+              ]
+            },
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": {
+              "Fn::FindInMap": [
+                "ImpervaVariables",
+                "General",
+                "HealthCheckPort"
+              ]
+            }
+          },
+          {
+            "ToPort": "-1",
+            "IpProtocol": "icmp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "-1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "vpc"
+        },
+        "GroupDescription": "Enable inbound traffic access to MX"
+      }
+    },
+    "MxWaitHandle": {
+      "Type": "AWS::CloudFormation::WaitConditionHandle",
+      "DependsOn": "ExecuteCheckCompliance"
+    },
+    "MxWaitCondition": {
+      "Type": "AWS::CloudFormation::WaitCondition",
+      "Properties": {
+        "Handle": {
+          "Ref": "MxWaitHandle"
+        },
+        "Timeout": "7200"
+      },
+      "DependsOn": [
+        "ManagementServer1",
+        "ManagementServer2",
+        "ExecuteCheckCompliance"
+      ]
+    }
+  },
+  "Conditions": {
+    "MXTerminationProtectionEnabled": {
+      "Fn::Equals": [
+        {
+          "Ref": "mxTerminationProtection"
+        },
+        "Yes"
+      ]
+    },
+    "IsAWSChina": {
+      "Fn::Equals": [
+        {
+          "Ref": "AWS::Partition"
+        },
+        "aws-cn"
+      ]
+    }
+  },
+  "Outputs": {
+    "cloudFormUrl": {
+      "Description": "Use this link to redeploying SecureSphere using CloudFormation",
+      "Value": "https://cloud-template-tool-app-security.imperva.com/?products=wafmxhabyol&unseal=True&addStartupScript=False&impervaLicenseKey=MC0CFQCliYVDM4F1DHC4N3sJ5bZSO19rLQIUdUB8dll/qP37UVG7Ri1Thn9FKgA=&keyPairMode=Provide%20Later&mxModel=AVM150&mxLicenseProfile=File&encryptedLicenseContent=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&mxInstanceType=m5.2xlarge&mxTerminationProtection=True&internetMethod=NAT&dnsConfMethod=DHCP&publicIp=False&manualPrivateIpSet=False&NetworkConfigMode=Provide%20Later&timezone=Asia/Bangkok&setNtp=False&mxLicenseInternalPassphrase=PassPhrase"
+    },
+    "wafmxhabyolAmiId": {
+      "Description": "The AMI-id in which wafmxhabyol instances are based on",
+      "Value": {
+        "Fn::FindInMap": [
+          "wafmxhabyolRegion2Ami",
+          {
+            "Ref": "AWS::Region"
+          },
+          "ImageId"
+        ]
+      }
+    },
+    "ManagementServerURL": {
+      "Description": "The Management Server internal URL",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Fn::GetAtt": [
+                "ELBHA",
+                "DNSName"
+              ]
+            },
+            ":8083"
+          ]
+        ]
+      }
+    }
+  }
+}

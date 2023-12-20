@@ -1,0 +1,67 @@
+{
+  "basePath": "/rest",
+  "host": "juiceshop.imperva.me",
+  "info": {
+    "title": "Swagger Specification 2.0. Host: juiceshop.imperva.me",
+    "version": "2.0"
+  },
+  "paths": {
+    "/admin/application-version": {
+      "get": {
+        "responses": {
+          "default": {
+            "description": "Response body is empty"
+          }
+        }
+      }
+    },
+    "/captcha/": {
+      "get": {
+        "responses": {
+          "default": {
+            "description": "Response body is empty"
+          }
+        }
+      }
+    },
+    "/languages": {
+      "get": {
+        "responses": {
+          "default": {
+            "description": "Response body is empty"
+          }
+        }
+      }
+    },
+    "/products/{param1}/reviews": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "param1",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response body is empty"
+          }
+        }
+      }
+    },
+    "/saveLoginIp": {
+      "get": {
+        "responses": {
+          "default": {
+            "description": "Response body is empty"
+          }
+        }
+      }
+    }
+  },
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0"
+}

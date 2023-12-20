@@ -1,0 +1,968 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Imperva SecureSphere 14.7.0.40 - WAF Gateway BYOL",
+  "Mappings": {
+    "ImpervaVariables": {
+      "General": {
+        "Products": " wafgwbyol",
+        "UseSingleGWGroup": "True"
+      },
+      "SSH": {
+        "UserName": "ec2-user"
+      },
+      "LBHealthCheck": {
+        "https": "false",
+        "interval": "15",
+        "unhealthyThreshold": "2",
+        "healthyThreshold": "2",
+        "configureLB": "false",
+        "timeout": "5",
+        "port": "541"
+      }
+    },
+    "wafgwbyolRegion2Ami": {
+      "af-south-1": {
+        "ImageId": "ami-0c527bf1485694157"
+      },
+      "ap-east-1": {
+        "ImageId": "ami-0be6375d4fb28c0b6"
+      },
+      "ap-northeast-1": {
+        "ImageId": "ami-0adf0dd89dab520cb"
+      },
+      "ap-northeast-2": {
+        "ImageId": "ami-04f91a65c2f5f3c83"
+      },
+      "ap-northeast-3": {
+        "ImageId": "ami-03ba47fe258bfb3a0"
+      },
+      "ap-south-1": {
+        "ImageId": "ami-0f39ca5975b2832a4"
+      },
+      "ap-southeast-1": {
+        "ImageId": "ami-08285bea65c85df80"
+      },
+      "ap-southeast-2": {
+        "ImageId": "ami-08e98ae63ac533e9a"
+      },
+      "ap-southeast-4": {
+        "ImageId": "ami-03bd21212341c672c"
+      },
+      "ca-central-1": {
+        "ImageId": "ami-073f063424774cd1b"
+      },
+      "eu-central-1": {
+        "ImageId": "ami-01a5f7343e03b2b96"
+      },
+      "eu-north-1": {
+        "ImageId": "ami-0f86298fa081fbdcc"
+      },
+      "eu-west-1": {
+        "ImageId": "ami-0472a53c9f38da081"
+      },
+      "eu-west-2": {
+        "ImageId": "ami-0ce5437895524018b"
+      },
+      "eu-west-3": {
+        "ImageId": "ami-0af386c67b99ac769"
+      },
+      "sa-east-1": {
+        "ImageId": "ami-0da44fdf9d1e19307"
+      },
+      "us-east-1": {
+        "ImageId": "ami-041b028a2d4ea9959"
+      },
+      "us-east-2": {
+        "ImageId": "ami-0066d124e2abc1cb9"
+      },
+      "us-gov-east-1": {
+        "ImageId": "ami-0f3584957d2554067"
+      },
+      "us-gov-west-1": {
+        "ImageId": "ami-0460d8f8e1a4f7846"
+      },
+      "us-west-1": {
+        "ImageId": "ami-0214f8579d5ed67f1"
+      },
+      "us-west-2": {
+        "ImageId": "ami-05e66da24c094ffe1"
+      }
+    }
+  },
+  "Parameters": {
+    "keyPairName": {
+      "ConstraintDescription": "Must be a valid Key Pair name",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Description": "Select name of an existing EC2 Key Pair to enable SSH access to the instances"
+    },
+    "vpc": {
+      "ConstraintDescription": "Must be a valid VPC Id (vpc-*)",
+      "Type": "AWS::EC2::VPC::Id",
+      "Description": "Select the Virtual Private Cloud (VPC) Id for the SecureSphere stack"
+    },
+    "securePassword": {
+      "AllowedPattern": "^[0-9a-zA-Z\\*\\=\\_\\|\\#\\%\\^\\:\\/\\~\\.\\,\\+\\-]*$",
+      "ConstraintDescription": "The password must be 7 to 14 characters long and must contain only the characters: 0-9,a-z,A-Z and *\\=_|#%^:/~.,+-",
+      "NoEcho": "true",
+      "Description": "Enter the Secure application password (GW->MX registration)",
+      "MaxLength": "14",
+      "MinLength": "7",
+      "Type": "String"
+    },
+    "timezone": {
+      "Default": "Asia/Bangkok",
+      "AllowedPattern": "[0-9a-zA-Z\\+\\-\\/\\.\\_]*",
+      "ConstraintDescription": "Timezone string must be 3 to 30 characters. Please Specify the time zone using the Posix TZ format",
+      "Description": "Enter Timezone string using the Posix TZ format. If you enter\t\"default\", the Amazon default (GMT) is used",
+      "MinLength": "3",
+      "MaxLength": "30",
+      "Type": "String"
+    },
+    "gwInstanceType": {
+      "Default": "c5.2xlarge",
+      "Description": "Select GW Instance Type",
+      "ConstraintDescription": "Must be of EC2 instance type: c4.xlarge, c4.2xlarge, c4.4xlarge, c5.xlarge, c5.2xlarge, c5.4xlarge, m4.xlarge, m4.2xlarge, m4.4xlarge, m5.xlarge, m5.2xlarge, m5.4xlarge",
+      "Type": "String",
+      "AllowedValues": [
+        "c4.xlarge",
+        "c4.2xlarge",
+        "c4.4xlarge",
+        "c5.xlarge",
+        "c5.2xlarge",
+        "c5.4xlarge",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m5.xlarge",
+        "m5.2xlarge",
+        "m5.4xlarge"
+      ]
+    },
+    "gwGroupMode": {
+      "Default": "NGRP",
+      "Description": "Select the desired mode for your gateway group",
+      "ConstraintDescription": "Must be either NGRP or gRPC",
+      "Type": "String",
+      "AllowedValues": [
+        "NGRP",
+        "gRPC"
+      ]
+    },
+    "gwMgmtSubnet": {
+      "Description": "Select Management Subnet",
+      "Type": "AWS::EC2::Subnet::Id",
+      "ConstraintDescription": "Must enter a list of SubnetIds"
+    },
+    "gwDataSubnet": {
+      "Description": "Select Data Subnet",
+      "Type": "AWS::EC2::Subnet::Id",
+      "ConstraintDescription": "Must enter a list of SubnetIds"
+    },
+    "numberOfGateways": {
+      "Default": "1",
+      "ConstraintDescription": "Must be a number between 1-15",
+      "Type": "Number",
+      "Description": "Choose the number of Gateway instances (1-15)",
+      "MinValue": "1",
+      "MaxValue": "20"
+    },
+    "gwModel": {
+      "Default": "AV2500",
+      "Type": "String",
+      "Description": "Enter the Gateway Model"
+    },
+    "managementServerHost": {
+      "Default": "internal-SIM4-MX-HA-ELBHA-QE69D4OE12CO-284029737.ap-southeast-1.elb.amazonaws.com",
+      "ConstraintDescription": "Not a valid DNS name or IP address",
+      "AllowedPattern": "[-_.a-zA-Z0-9]*",
+      "Type": "String",
+      "Description": "Enter Management Server's Hostname or IP address",
+      "MinLength": "3"
+    },
+    "gwGroup": {
+      "Default": "test-gw",
+      "ConstraintDescription": "Group name must contain 3 to 128 characters",
+      "AllowedPattern": "[0-9a-zA-Z-_]*",
+      "Type": "String",
+      "Description": "Enter Gateway Group Name",
+      "MinLength": "3",
+      "MaxLength": "128"
+    },
+    "impervaLicenseKey": {
+      "Default": "MC0CFQCliYVDM4F1DHC4N3sJ5bZSO19rLQIUdUB8dll/qP37UVG7Ri1Thn9FKgA=",
+      "ConstraintDescription": "Must be a 64 characters Base64 type string",
+      "Type": "String",
+      "Description": "Enter the Imperva-License-Key to unseal machine",
+      "MinLength": "64",
+      "MaxLength": "64"
+    }
+  },
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Parameters": [
+            "keyPairName",
+            "gwMgmtSubnet",
+            "gwDataSubnet",
+            "securePassword",
+            "vpc"
+          ],
+          "Label": {
+            "default": "Fill following blank parameters:"
+          }
+        },
+        {
+          "Parameters": [
+            "gwGroup",
+            "managementServerHost",
+            "timezone",
+            "gwModel",
+            "gwGroupMode"
+          ],
+          "Label": {
+            "default": "SecureSphere Settings (already been filled)"
+          }
+        },
+        {
+          "Parameters": [
+            "impervaLicenseKey",
+            "gwInstanceType",
+            "numberOfGateways"
+          ],
+          "Label": {
+            "default": "EC2 Settings (already been filled)"
+          }
+        }
+      ],
+      "ParameterLabels": {
+        "keyPairName": {
+          "default": "KeyPair Name"
+        },
+        "vpc": {
+          "default": "VPC ID"
+        },
+        "securePassword": {
+          "default": "Secure Password"
+        },
+        "timezone": {
+          "default": "TimeZone"
+        },
+        "gwInstanceType": {
+          "default": "Gateway Instance Type"
+        },
+        "gwGroupMode": {
+          "default": "Gateway Group Mode"
+        },
+        "gwMgmtSubnet": {
+          "default": "Gateway Management Subnet"
+        },
+        "gwDataSubnet": {
+          "default": "Gateway Data Subnet"
+        },
+        "numberOfGateways": {
+          "default": "Number of Gateways to deploy"
+        },
+        "gwModel": {
+          "default": "Gateway Model"
+        },
+        "managementServerHost": {
+          "default": "Management Server Host Name (or IP)"
+        },
+        "gwGroup": {
+          "default": "Gateway Group"
+        },
+        "impervaLicenseKey": {
+          "default": "Imperva License Key"
+        }
+      }
+    }
+  },
+  "Resources": {
+    "CheckComplianceExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  {
+                    "Fn::Join": [
+                      ".",
+                      [
+                        "lambda",
+                        "amazonaws.com"
+                      ]
+                    ]
+                  }
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "lambdaCheckStackCompliance",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "VisualEditor0",
+                  "Effect": "Allow",
+                  "Action": [
+                    "cloudformation:DescribeStacks",
+                    "cloudformation:DescribeStackResources"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        ":",
+                        [
+                          "arn",
+                          {
+                            "Ref": "AWS::Partition"
+                          },
+                          "cloudformation",
+                          "*",
+                          "*",
+                          "stack/*/*"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CheckCompliance": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Runtime": {
+          "Fn::If": [
+            "IsAWSChina",
+            "python3.9",
+            "python3.11"
+          ]
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "CheckComplianceExecutionRole",
+            "Arn"
+          ]
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "import urllib3",
+                "import json",
+                "import boto3",
+                "",
+                "# Globals",
+                "http = urllib3.PoolManager()",
+                "",
+                "def send(event, context, responseStatus, responseData, reasonMessage):",
+                "    responseUrl = event['ResponseURL']",
+                "    responseBody = {",
+                "        'Status': responseStatus,",
+                "        'Reason': reasonMessage,",
+                "        'PhysicalResourceId': context.log_stream_name,",
+                "        'StackId': event['StackId'],",
+                "        'RequestId': event['RequestId'],",
+                "        'LogicalResourceId': event['LogicalResourceId'],",
+                "        'NoEcho': False,",
+                "        'Data': responseData",
+                "    }",
+                "",
+                "    encoded_data = json.dumps(responseBody).encode('utf-8')",
+                "    try:    ",
+                "        http.request(",
+                "            'PUT',",
+                "            responseUrl,",
+                "            body=encoded_data,",
+                "            headers={",
+                "                'Content-Type' : 'application/json; charset=UTF-8',",
+                "                'Content-Length' : str(len(encoded_data))",
+                "            }",
+                "        )",
+                "    except Exception as e:",
+                "        print ('send(..) failure: ' + str(e))",
+                "",
+                "def handler(event, context):",
+                "    client = boto3.client('cloudformation', region_name=event['ResourceProperties']['RegionName'])",
+                "    stat = client.describe_stacks(StackName=event['ResourceProperties']['StackName'])['Stacks'][0]['StackStatus']",
+                "",
+                "    if stat != 'UPDATE_IN_PROGRESS':",
+                "        send(event, context, 'SUCCESS', {}, '')",
+                "        return",
+                "    send(event, context, 'FAILED', {}, 'Your stack cannot be updated since the new definition includes resources other than a scale-group of gateways. Please refer to the manual for details')",
+                "    return",
+                "    response = client.describe_stack_resources(StackName=event['ResourceProperties']['StackName'])['StackResources']",
+                "    resources = set()",
+                "    for resource in response:",
+                "        resources.add(resource['LogicalResourceId'])",
+                "    if 'GatewayScalingGroup' not in resources or 'ManagementServer' in resources or 'ManagementServer1' in resources:",
+                "        send(event, context, 'FAILED', {}, 'Your stack cannot be updated since the current stack includes resources other than a scale-group of gateways. Please refer to the manual for details')",
+                "        return",
+                "    send(event, context, 'SUCCESS', {}, '')"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "ExecuteCheckCompliance": {
+      "Type": "Custom::LambdaInvoke",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CheckCompliance",
+            "Arn"
+          ]
+        },
+        "RegionName": {
+          "Ref": "AWS::Region"
+        },
+        "StackName": {
+          "Ref": "AWS::StackName"
+        },
+        "DummyToMakeItAlwaysRun": "ACNCU8SX29MBSRNP"
+      },
+      "DependsOn": "CheckCompliance"
+    },
+    "GwRootRole": {
+      "Type": "AWS::IAM::Role",
+      "DependsOn": "ExecuteCheckCompliance",
+      "Properties": {
+        "Path": "/",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  {
+                    "Fn::Join": [
+                      ".",
+                      [
+                        "ec2",
+                        {
+                          "Ref": "AWS::URLSuffix"
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "GwRolePolicies": {
+      "Type": "AWS::IAM::Policy",
+      "DependsOn": "ExecuteCheckCompliance",
+      "Properties": {
+        "PolicyName": "root",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "ec2:DescribeInstances",
+                "ec2:DescribeSecurityGroups",
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "autoscaling:DescribeAutoScalingInstances",
+                "elasticloadbalancing:DescribeLoadBalancers"
+              ],
+              "Resource": "*",
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "ec2:AuthorizeSecurityGroupIngress"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    ":",
+                    [
+                      "arn",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      "ec2",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "security-group/",
+                            {
+                              "Fn::GetAtt": [
+                                "GwInstanceSecurityGroup",
+                                "GroupId"
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    ":",
+                    [
+                      "arn",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      "ec2",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "security-group-rule/*"
+                    ]
+                  ]
+                }
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "cloudformation:DescribeStackResource",
+                "cloudformation:DescribeStackResources",
+                "cloudformation:DescribeStacks",
+                "cloudformation:CancelUpdateStack"
+              ],
+              "Resource": {
+                "Ref": "AWS::StackId"
+              },
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "ec2:ModifyNetworkInterfaceAttribute",
+                "ec2:AttachNetworkInterface"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    ":",
+                    [
+                      "arn",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      "ec2",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "instance/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    ":",
+                    [
+                      "arn",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      "ec2",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "network-interface/*"
+                    ]
+                  ]
+                }
+              ],
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceTag/aws:cloudformation:stack-id": {
+                    "Ref": "AWS::StackId"
+                  }
+                }
+              },
+              "Effect": "Allow"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "GwRootRole"
+          }
+        ]
+      }
+    },
+    "GwRootInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "DependsOn": [
+        "ExecuteCheckCompliance",
+        "GwRolePolicies"
+      ],
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "GwRootRole"
+          }
+        ]
+      }
+    },
+    "GwInstanceSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "DependsOn": "ExecuteCheckCompliance",
+      "Properties": {
+        "SecurityGroupIngress": [
+          {
+            "ToPort": "22",
+            "IpProtocol": "tcp",
+            "CidrIp": "10.0.0.0/8",
+            "FromPort": "22"
+          },
+          {
+            "ToPort": "22",
+            "IpProtocol": "tcp",
+            "CidrIp": "172.16.0.0/12",
+            "FromPort": "22"
+          },
+          {
+            "ToPort": "22",
+            "IpProtocol": "tcp",
+            "CidrIp": "192.168.0.0/16",
+            "FromPort": "22"
+          },
+          {
+            "ToPort": "443",
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "443"
+          },
+          {
+            "ToPort": "80",
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "80"
+          },
+          {
+            "ToPort": {
+              "Fn::FindInMap": [
+                "ImpervaVariables",
+                "LBHealthCheck",
+                "port"
+              ]
+            },
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": {
+              "Fn::FindInMap": [
+                "ImpervaVariables",
+                "LBHealthCheck",
+                "port"
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "vpc"
+        },
+        "GroupDescription": "Enable inbound traffic access to GW"
+      }
+    },
+    "GwWaitHandle": {
+      "DependsOn": "ExecuteCheckCompliance",
+      "Type": "AWS::CloudFormation::WaitConditionHandle"
+    },
+    "GwWaitCondition": {
+      "Type": "AWS::CloudFormation::WaitCondition",
+      "Properties": {
+        "Handle": {
+          "Ref": "GwWaitHandle"
+        },
+        "Timeout": "1200"
+      },
+      "DependsOn": [
+        "ExecuteCheckCompliance",
+        "GatewayWAF1"
+      ]
+    },
+    "GatewayWAF1": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": "ExecuteCheckCompliance",
+      "Properties": {
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "WaitHandle : ",
+                {
+                  "Ref": "GwWaitHandle"
+                },
+                "\n",
+                "StackId : ",
+                {
+                  "Ref": "AWS::StackId"
+                },
+                "\n",
+                "StackName : ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "\n",
+                "Region : ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "ProductRole : gateway\n",
+                "GatewayMode : waf\n",
+                "ProductLicensing : BYOL\n",
+                "AssetTag : ",
+                {
+                  "Ref": "gwModel"
+                },
+                "\n",
+                "ImpervaLicenseKey : ",
+                {
+                  "Ref": "impervaLicenseKey"
+                },
+                "\n"
+              ]
+            ]
+          }
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "wafgwbyolRegion2Ami",
+            {
+              "Ref": "AWS::Region"
+            },
+            "ImageId"
+          ]
+        },
+        "KeyName": {
+          "Ref": "keyPairName"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "GwInstanceSecurityGroup"
+          }
+        ],
+        "IamInstanceProfile": {
+          "Ref": "GwRootInstanceProfile"
+        },
+        "InstanceType": {
+          "Ref": "gwInstanceType"
+        },
+        "SubnetId": {
+          "Ref": "gwDataSubnet"
+        },
+        "DisableApiTermination": {
+          "Ref": "AWS::NoValue"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "_",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "GatewayWAF1"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "commands": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "/opt/SecureSphere/etc/ec2/setup_management_nic_creation --management_subnets ",
+                {
+                  "Ref": "gwMgmtSubnet"
+                },
+                " --data_subnets ",
+                {
+                  "Ref": "gwDataSubnet"
+                },
+                " --aws_security_group ",
+                {
+                  "Ref": "GwInstanceSecurityGroup"
+                }
+              ]
+            ]
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "/opt/SecureSphere/etc/ec2/ec2_auto_ftl --init_mode ",
+                " --user=",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "SSH",
+                    "UserName"
+                  ]
+                },
+                " --gateway_group=",
+                {
+                  "Ref": "gwGroup"
+                },
+                " --secure_password=",
+                {
+                  "Ref": "securePassword"
+                },
+                " --imperva_password=",
+                {
+                  "Ref": "securePassword"
+                },
+                " --timezone=",
+                {
+                  "Ref": "timezone"
+                },
+                " --time_servers=",
+                "default",
+                " --dns_servers=",
+                "default",
+                " --dns_domain=",
+                "default",
+                " --management_server_ip=",
+                {
+                  "Ref": "managementServerHost"
+                },
+                " --management_interface=eth1",
+                " --internal_data_interface=eth0",
+                " --external_data_interface=eth0",
+                " --check_server_status",
+                " --check_gateway_received_configuration",
+                " --register",
+                " --initiate_services",
+                " --set_krp",
+                " --use_single_gateway_group=",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "General",
+                    "UseSingleGWGroup"
+                  ]
+                },
+                " --lb_healthcheck_port=",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "LBHealthCheck",
+                    "port"
+                  ]
+                },
+                " --lb_healthcheck_https=",
+                {
+                  "Fn::FindInMap": [
+                    "ImpervaVariables",
+                    "LBHealthCheck",
+                    "https"
+                  ]
+                },
+                " --product=WAF",
+                {
+                  "Fn::If": [
+                    "ConfigureGRPC",
+                    " --set_grpc",
+                    {
+                      "Ref": "AWS::NoValue"
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        "MXCredentials": [
+          {
+            "MXAccessKey": ""
+          },
+          {
+            "MXSecretKey": ""
+          }
+        ]
+      }
+    }
+  },
+  "Conditions": {
+    "ConfigureGRPC": {
+      "Fn::Equals": [
+        {
+          "Ref": "gwGroupMode"
+        },
+        "gRPC"
+      ]
+    },
+    "IsAWSChina": {
+      "Fn::Equals": [
+        {
+          "Ref": "AWS::Partition"
+        },
+        "aws-cn"
+      ]
+    }
+  },
+  "Outputs": {
+    "cloudFormUrl": {
+      "Description": "Use this link to redeploying SecureSphere using CloudFormation",
+      "Value": "https://cloud-template-tool-app-security.imperva.com/?products=wafgwbyol&unseal=True&addStartupScript=False&impervaLicenseKey=MC0CFQCliYVDM4F1DHC4N3sJ5bZSO19rLQIUdUB8dll/qP37UVG7Ri1Thn9FKgA=&keyPairMode=Provide%20Later&hybridMode=False&gwGroupNameOverride=True&gwGroup=test-gw&gwGroupMode=NGRP&gwModel=AV2500&managementServerHost=internal-SIM4-MX-HA-ELBHA-QE69D4OE12CO-284029737.ap-southeast-1.elb.amazonaws.com&scaling=False&numberOfGateways=1&gwInstanceType=c5.2xlarge&internetMethod=NAT&gwNicsNum=2&dnsConfMethod=DHCP&NetworkConfigMode=Provide%20Later&gwDataSecurityGroupSwitcher=False&timezone=Asia/Bangkok&setNtp=False"
+    },
+    "wafgwbyolAmiId": {
+      "Description": "The AMI-id in which wafgwbyol instances are based on",
+      "Value": {
+        "Fn::FindInMap": [
+          "wafgwbyolRegion2Ami",
+          {
+            "Ref": "AWS::Region"
+          },
+          "ImageId"
+        ]
+      }
+    }
+  }
+}

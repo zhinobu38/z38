@@ -1,0 +1,177 @@
+{
+    "basePath": "/api",
+    "host": "juiceshop.imperva.me",
+    "info": {
+        "title": "Swagger Specification 2.0. Host: juiceshop.imperva.me",
+        "version": "2.0"
+    },
+    "paths": {
+        "/Addresss": {
+            "get": {
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            }
+        },
+        "/Addresss/{param1}": {
+            "get": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "param1",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            }
+        },
+        "/Challenges/": {
+            "get": {
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            }
+        },
+        "/Deliverys": {
+            "get": {
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            }
+        },
+        "/Products/{param1}": {
+            "get": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "param1",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            }
+        },
+        "/BasketItems/": {
+            "post": {
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["quantity","BasketId","ProductId"],
+                            "properties": {
+                                "quantity": {"type": "integer","required": true},
+                                "BasketId": {"type": "integer","required": true},
+                                "ProductId": {"type": "integer","required": true}
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            }
+        },
+        "/BasketItems/{param1}": {
+            "get": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "param1",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            },
+            "put": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "param1",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["quantity"],
+                            "properties": {
+                                "quantity": {"type": "integer","required": true}
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            },
+            "delete": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "param1",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            }
+        },
+        "/Quantitys/": {
+            "get": {
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            }
+        },
+        "/Recycles/": {
+            "get": {
+                "responses": {
+                    "default": {
+                        "description": "Response body is empty"
+                    }
+                }
+            }
+        }
+    },
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0"
+}
